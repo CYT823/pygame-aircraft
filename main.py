@@ -90,10 +90,12 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        # elif event.type == pygame.KEYDOWN:
-        #     if event.key == "K_q":
-        #         running = False
-    
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = False
+        elif event.type == pygame.JOYAXISMOTION:
+            print(event)
+
     # upadte game
     all_sprites.update() # call every game object's update function
 

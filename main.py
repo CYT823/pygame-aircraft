@@ -37,6 +37,11 @@ class Player(pygame.sprite.Sprite):
             self.rect.right = WIDTH
         elif self.rect.left < 0:
             self.rect.left = 0
+        
+    def shoot(self):
+        bullet = Bullet(self.rect.centerx, self.rect.top)
+        all_sprites.add(bullet)
+        bullets.add(bullet)
 
 # create rock object
 class Rock(pygame.sprite.Sprite):
@@ -60,6 +65,26 @@ class Rock(pygame.sprite.Sprite):
             self.speedx = random.randrange(-3, 3)
             self.speedy = random.randrange(2, 10)
 
+# create bullet object
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((10, 20))
+        self.image.fill(GREEN)
+        self.rect = self.image.get_rect() # create rectangle for the surface
+        self.rect.centerx = x
+        self.rect.bottom = y
+        self.speedy = -10
+
+    def update(self):
+        self.rect.y += self.speedy
+        if self.rect.bottom < 0:
+            self.kill()
+
+def create_rocks():
+    rock = Rock()
+    all_sprites.add(rock)
+    rocks.add(rock)
 
 # init game and build game window
 pygame.init()
@@ -73,13 +98,15 @@ joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_coun
 # clock object
 clock = pygame.time.Clock()
 
-# create sprites(game objects)
+# create sprites (game objects)
 all_sprites = pygame.sprite.Group()
+rocks = pygame.sprite.Group()
+bullets = pygame.sprite.Group()
+
 player = Player()
 all_sprites.add(player)
 for i in range(8):
-    rock = Rock()
-    all_sprites.add(rock)
+    create_rocks()
 
 # looping...
 while running:
@@ -91,14 +118,21 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
+            # ESC to exit
             if event.key == pygame.K_ESCAPE:
                 running = False
+            # SPACE to shoot
+            if event.key == pygame.K_SPACE:
+                player.shoot()
         elif event.type == pygame.JOYAXISMOTION:
             print(event)
 
     # upadte game
     all_sprites.update() # call every game object's update function
-
+    hits = pygame.sprite.groupcollide(rocks, bullets, True, True) # kill both rock object and bullet object if there is a collision happened
+    for hit in hits:
+        create_rocks()
+    
     # render
     screen.fill(WHITE)
     all_sprites.draw(screen)

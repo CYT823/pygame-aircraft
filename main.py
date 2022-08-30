@@ -68,6 +68,7 @@ class Rock(pygame.sprite.Sprite):
     def rotate(self):
         self.total_degree = (self.total_degree + self.rotate_degree) % 360 
         self.image = pygame.transform.rotate(self.image_ori, self.total_degree)
+        # get origin center >> set new rect >> set center for new rect
         center = self.rect.center
         self.rect = self.image.get_rect()
         self.rect.center = center
@@ -98,6 +99,32 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.y += self.speedy
         if self.rect.bottom < 0:
             self.kill()
+
+# explosion object
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self, center, size):
+        super().__init__()
+        self.size = size
+        self.image = explode_animation[self.size][0]
+        self.rect = self.image.get_rect() # create rectangle for the surface
+        self.rect.center = center
+        self.frame = 0
+        self.last_update = pygame.time.get_ticks()
+        self.frame_rate = 50
+
+    def update(self):
+        now = pygame.time.get_ticks()
+        if now - self.last_update > self.frame_rate:
+            self.last_update = now
+            self.frame += 1
+            if self.frame == len(explode_animation[self.size]):
+                self.kill()
+            else:
+                self.image = explode_animation[self.size][self.frame]
+                # get origin center >> set new rect >> set center for new rect
+                center = self.rect.center
+                self.rect = self.image.get_rect()
+                self.rect.center = center
 
 # create rock object
 def create_rocks():
@@ -148,7 +175,15 @@ if __name__ == "__main__":
     for i in range(7):
         rock_imgs.append(pygame.image.load(os.path.join("img", f"rock{i}.png")).convert())
     font_family = pygame.font.match_font("arial")
-
+    explode_animation = {}
+    explode_animation["large"] = []
+    explode_animation["small"] = []
+    for i in range(9):
+        explode_img = pygame.image.load(os.path.join("img", f"expl{i}.png")).convert()
+        explode_img.set_colorkey(BLACK)
+        explode_animation["large"].append(pygame.transform.scale(explode_img, (75, 75)))
+        explode_animation["small"].append(pygame.transform.scale(explode_img, (30, 30)))
+    
     # load sounds(shoot, explode, bgm)
     shoot_sound = pygame.mixer.Sound(os.path.join("sound", "shoot.wav"))
     explode_sounds = []
@@ -193,16 +228,22 @@ if __name__ == "__main__":
 
         # update game
         all_sprites.update() # call every game object's update function
+        
         hits = pygame.sprite.groupcollide(rocks, bullets, True, True) # kill both rock object and bullet object if there is a collision happened
         for hit in hits:
             random.choice(explode_sounds).play()
             score += hit.radius
+            explosion = Explosion(hit.rect.center, "large")
+            all_sprites.add(explosion)
             create_rocks()
+        
         damages = pygame.sprite.spritecollide(player, rocks, True, pygame.sprite.collide_circle)
         for damage in damages:
             player.health -= damage.radius
             if player.health < 0:
                 running = False
+            explosion = Explosion(damage.rect.center, "small")
+            all_sprites.add(explosion)
             create_rocks()
         
         # render

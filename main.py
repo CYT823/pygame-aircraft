@@ -3,7 +3,6 @@ References:
     [1] Pygame Docs, https://www.pygame.org/docs/
     [2] Pygame tutorial, https://youtu.be/61eX0bFAsYs
 '''
-from email.contentmanager import raw_data_manager
 import pygame
 import random
 import os
@@ -40,7 +39,7 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         now = pygame.time.get_ticks()
         if self.gun_level > 1 and now - self.gun_time > 5000:
-            self.gun_level = 1
+            self.gun_level -= 1
             self.gun_time = now
 
         if self.hidden and pygame.time.get_ticks() - self.hide_time > 1000:
@@ -91,7 +90,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = (WIDTH/2, HEIGHT+500)
 
     def gun_upgrade(self):
-        self.gun_level += 1
+        self.gun_level = self.gun_level + 1 if self.gun_level < 3 else 3
         self.gun_time = pygame.time.get_ticks()
 
 # create rock object
@@ -106,7 +105,7 @@ class Rock(pygame.sprite.Sprite):
         self.rect.x = random.randrange(0, WIDTH - self.rect.width)
         self.rect.y = random.randrange(-180, -100)
         self.speedx = random.randrange(-3, 3)
-        self.speedy = random.randrange(2, 5)
+        self.speedy = random.randrange(1, 8)
         self.total_degree = 0
         self.rotate_degree = random.randrange(-5, 5)
     
@@ -194,9 +193,9 @@ def create_rocks():
     rocks.add(rock)
 
 # score record
-def draw_text(surface, text, size, x, y):
+def draw_text(surface, text, size, color, x, y):
     font = pygame.font.Font(font_family, size)
-    text_surface = font.render(text, True, WHITE)
+    text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect()
     text_rect.centerx = x
     text_rect.top = y
@@ -222,13 +221,35 @@ def draw_lives(surface, lives, img, x, y):
         img_rect.y = y
         surface.blit(img, img_rect)
 
+# init frame which show how to play and press any key to start the game
+def draw_init():
+    screen.blit(bg_img, (0, 0))
+    draw_text(screen, "Earth Defense", 64, WHITE, WIDTH/2, HEIGHT/4)
+    draw_text(screen, "← → for move", 22, BLACK, WIDTH/2, HEIGHT/2)
+    draw_text(screen, "SPACE for shoot", 22, BLACK, WIDTH/2, HEIGHT/2 + 30)
+    draw_text(screen, "Press any key to start", 18, BLACK, WIDTH/2, HEIGHT*3/4)
+    pygame.display.update()
+
+    waiting = True
+    while waiting:
+        clock.tick(FPS) # Program won't run more than 60 frames per second.
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return True
+            elif event.type == pygame.KEYUP:
+                waiting = False
+                return False
+
 if __name__ == "__main__":
     # init game and build game window
     pygame.init()
     pygame.mixer.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("pygame-aircraft")
-
+    pygame.display.set_caption("Earth Defense")
+    
     # create joy decvices objects
     pygame.joystick.init()
     joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
@@ -242,7 +263,8 @@ if __name__ == "__main__":
     player_img = pygame.image.load(os.path.join("img", "player.png")).convert()
     player_mini_img = pygame.transform.scale(player_img, (25, 19))
     player_mini_img.set_colorkey(BLACK)
-    
+    pygame.display.set_icon(player_mini_img)
+
     bullet_img = pygame.image.load(os.path.join("img", "bullet.png")).convert()
     
     rock_imgs = []
@@ -268,7 +290,7 @@ if __name__ == "__main__":
     superpower_imgs["gun"] = pygame.image.load(os.path.join("img", "gun.png")).convert()
     
     # setting font 
-    font_family = pygame.font.match_font("arial")
+    font_family = os.path.join("GenJyuuGothicX-P-Heavy.ttf")
     
     # load sounds(shoot, explode, bgm)
     shoot_sound = pygame.mixer.Sound(os.path.join("sound", "shoot.wav"))
@@ -291,14 +313,21 @@ if __name__ == "__main__":
     # create player and rock object
     player = Player()
     all_sprites.add(player)
-    for i in range(8):
+    for i in range(10):
         create_rocks()
 
     # parameters
     score = 0
-    
+    show_init = True
+
     # looping...
     while running:
+        if show_init:
+            isClosed = draw_init()
+            if isClosed:
+                break
+            show_init = False
+        
         # FPS setting
         clock.tick(FPS) # Program won't run more than 60 frames per second.
         
@@ -379,12 +408,24 @@ if __name__ == "__main__":
                 power_gun_sound.play()
 
         if player.lives == 0 and not(death_explosion.alive()):
-            running = False
+            show_init = True
+            # init sprites
+            all_sprites = pygame.sprite.Group()
+            rocks = pygame.sprite.Group()
+            bullets = pygame.sprite.Group()
+            powers = pygame.sprite.Group()
+            # init player and rock object
+            player = Player()
+            all_sprites.add(player)
+            for i in range(10):
+                create_rocks()
+            # init parameters
+            score = 0
         
         # render
         screen.blit(bg_img, (0, 0))
         all_sprites.draw(screen)
-        draw_text(screen, str(score), 18, WIDTH/2, 10)
+        draw_text(screen, str(score), 18, WHITE, WIDTH/2, 10)
         draw_health(screen, player.health, 5, 15)
         draw_lives(screen, player.lives, player_mini_img, WIDTH - 100, 15)
         pygame.display.update()

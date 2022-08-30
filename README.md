@@ -2,17 +2,17 @@
 -----
 ### Pictures of the game
 <p>
-<img src="https://user-images.githubusercontent.com/40158342/187414301-1e759bb9-1ee6-4a2b-9717-692e40deb539.png" width="256" height="305"/>
+<img src="https://user-images.githubusercontent.com/40158342/187414301-1e759bb9-1ee6-4a2b-9717-692e40deb539.png" width="400" height="475"/>
 　
-<img src="https://user-images.githubusercontent.com/40158342/187414305-268976c1-2404-4969-90a3-4509b27c80bf.png" width="256" height="305"/>
+<img src="https://user-images.githubusercontent.com/40158342/187414305-268976c1-2404-4969-90a3-4509b27c80bf.png" width="400" height="475"/>
 </p>
 
 -----
 ### Controller
 <p>
-<img src="https://user-images.githubusercontent.com/40158342/187435637-27927fde-468e-4541-af72-5fb3401cd86d.png" width="100" height="100"/>
+<img src="https://user-images.githubusercontent.com/40158342/187435637-27927fde-468e-4541-af72-5fb3401cd86d.png" width="150" height="150"/>
 ✔　
-<img src="https://user-images.githubusercontent.com/40158342/187434648-5554237b-eb9f-4363-ba14-b3cc3e16ac79.png" width="80" height="80"/>
+<img src="https://user-images.githubusercontent.com/40158342/187434648-5554237b-eb9f-4363-ba14-b3cc3e16ac79.png" width="125" height="125"/>
 ❌(not yet)
 </p>
 

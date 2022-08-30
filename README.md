@@ -1,4 +1,4 @@
-### pygmae-aircraft
+### pygame-aircraft
 -----
 ### Pictures of the game
 <p>

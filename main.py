@@ -365,7 +365,7 @@ if __name__ == "__main__":
                 if event.axis == 0:
                     if (event.value * 10) > 0.8:
                         player.current_motion = 1
-                    elif (event.value * 10) < - 0.8:
+                    elif (event.value * 10) < -0.8:
                         player.current_motion = -1
                     else:
                         player.current_motion = 0

@@ -13,7 +13,7 @@
 <img src="https://user-images.githubusercontent.com/40158342/187435637-27927fde-468e-4541-af72-5fb3401cd86d.png" width="150" height="150"/>
 ✔　
 <img src="https://user-images.githubusercontent.com/40158342/187434648-5554237b-eb9f-4363-ba14-b3cc3e16ac79.png" width="125" height="125"/>
-❌(not yet)
+✔
 </p>
 
 -----
@@ -36,7 +36,8 @@ There are two kinds of power gift, which are `shield` and `thunder`, may come ou
 - [x] lives
 - [x] health
 - [x] keyboard event
-- [ ] xbox controller event
+- [x] xbox controller event
+- [ ] user record
 
 -----
 ### References:

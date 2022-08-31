@@ -18,8 +18,15 @@
 
 -----
 ### How to play :
+[ Keyboard player ]<br>
 Press `←` `→` key to control the aircraft. <br>
 Press `SPACE` to shoot.<br>
+Press `ESC` key to quit.<br>
+
+[ Xbox player ]<br>
+Pusing `axis` to contorl the aircraft.<br>
+Press `A` or `RB` or `LB` button to shoot.<br>
+Press `X` button to quit.<br>
 
 There are two kinds of power gift, which are `shield` and `thunder`, may come out after the bullet hits the meteorite.<br>
 > shield - heal the aircraft.<br/>

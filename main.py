@@ -35,6 +35,7 @@ class Player(pygame.sprite.Sprite):
         self.hide_time = 0
         self.gun_level = 1
         self.gun_time = 0
+        self.current_motion = 0
 
     def update(self):
         now = pygame.time.get_ticks()
@@ -56,6 +57,9 @@ class Player(pygame.sprite.Sprite):
             self.rect.right = WIDTH
         elif self.rect.left < 0:
             self.rect.left = 0
+        
+        # This is for xbox controller
+        self.rect.x += self.current_motion * self.speedx
         
     def shoot(self):
         if not(self.hidden):
@@ -225,9 +229,10 @@ def draw_lives(surface, lives, img, x, y):
 def draw_init():
     screen.blit(bg_img, (0, 0))
     draw_text(screen, "Earth Defense", 64, WHITE, WIDTH/2, HEIGHT/4)
-    draw_text(screen, "← → for move", 22, BLACK, WIDTH/2, HEIGHT/2)
-    draw_text(screen, "SPACE for shoot", 22, BLACK, WIDTH/2, HEIGHT/2 + 30)
-    draw_text(screen, "Press any key to start", 18, BLACK, WIDTH/2, HEIGHT*3/4)
+    draw_text(screen, "<ESC>  to  quit", 22, WHITE, WIDTH*4/5, HEIGHT/3+35)
+    draw_text(screen, "Move: ← →", 22, BLACK, WIDTH/4, HEIGHT*6/8)
+    draw_text(screen, "Shoot: SPACE", 22, BLACK, WIDTH*3/4, HEIGHT*6/8)
+    draw_text(screen, "Press any key to start!", 22, BLACK, WIDTH/2, HEIGHT*7/8-20)
     pygame.display.update()
 
     waiting = True
@@ -242,8 +247,18 @@ def draw_init():
             elif event.type == pygame.KEYUP:
                 waiting = False
                 return False
+            elif event.type == pygame.JOYBUTTONDOWN:
+                if event.button == 2:
+                    return True
+                else:
+                    return False
+            
 
 if __name__ == "__main__":
+    # parameters
+    score = 0
+    show_init = True
+
     # init game and build game window
     pygame.init()
     pygame.mixer.init()
@@ -316,10 +331,6 @@ if __name__ == "__main__":
     for i in range(10):
         create_rocks()
 
-    # parameters
-    score = 0
-    show_init = True
-
     # looping...
     while running:
         if show_init:
@@ -342,8 +353,22 @@ if __name__ == "__main__":
                 # SPACE to shoot
                 if event.key == pygame.K_SPACE:
                     player.shoot()
+            elif event.type == pygame.JOYBUTTONDOWN:
+                # A:0 B:1 X:2 Y:3 LB:4 RB:5 menu:7
+                if event.button == 0 or event.button == 4 or event.button == 5:
+                    player.shoot()
+                elif event.button == 2:
+                    running = False
             elif event.type == pygame.JOYAXISMOTION:
-                print(event)
+                # axis 0:horizontal, 1:vertical
+                # current_motion 0:stop, 1:right, -1:left for xbox controller
+                if event.axis == 0:
+                    if (event.value * 10) > 0.8:
+                        player.current_motion = 1
+                    elif (event.value * 10) < - 0.8:
+                        player.current_motion = -1
+                    else:
+                        player.current_motion = 0
 
         # update game
         all_sprites.update() # call every game object's update function
